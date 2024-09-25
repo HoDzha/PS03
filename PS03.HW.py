@@ -1,8 +1,11 @@
 import requests
 from bs4 import BeautifulSoup
+from googletrans import Translator
+
 # Создаём функцию, которая будет получать информацию
-def get_english_words():
+def get_words():
     url = "https://randomword.com/"
+    translator = Translator()
     try:
         response = requests.get(url)
 
@@ -10,11 +13,15 @@ def get_english_words():
         soup = BeautifulSoup(response.content, "html.parser")
         # Получаем слово. text.strip удаляет все пробелы из результата
         english_words = soup.find("div", id="random_word").text.strip()
+        words = translator.translate(english_words, dest='ru').text
+
         # Получаем описание слова
-        word_definition = soup.find("div", id="random_word_definition").text.strip()
+        english_word_definition = soup.find("div", id="random_word_definition").text.strip()
+        word_definition = translator.translate(english_word_definition, dest='ru').text
+
         # Чтобы программа возвращала словарь
         return {
-            "english_words": english_words,
+            "words": words,
             "word_definition": word_definition
         }
     # Функция, которая сообщит об ошибке, но не остановит программу
@@ -27,8 +34,8 @@ def word_game():
     print("Добро пожаловать в игру")
     while True:
         # Создаём функцию, чтобы использовать результат функции-словаря
-        word_dict = get_english_words()
-        word = word_dict.get("english_words")
+        word_dict = get_words()
+        word = word_dict.get("words")
         word_definition = word_dict.get("word_definition")
 
         # Начинаем игру
